@@ -9,8 +9,14 @@ ordersRoute.get('/',(req, res, next) =>{
 })
 
 ordersRoute.post('/',(req, res, next) =>{
+    const order ={
+       productId: req.params.productId,
+       quantity: req.params.quantity
+    }
     res.status(200).json({
-        message:"order created"})
+        message:"order created",
+        ordre: order
+    })
 })
 
 ordersRoute.get('/:orderId',(req, res, next) =>{

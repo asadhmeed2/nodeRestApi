@@ -9,8 +9,14 @@ productRoute.get('/',(req, res, next) =>{
 })
 
 productRoute.post('/',(req, res, next) =>{
+    const product ={
+        name: req.body.name,
+        price: req.body.price,
+    }
     res.status(200).json({
-        message:"adding a product"})
+        message:"adding a product",
+        createdProduct:product
+    })
 })
 
 productRoute.get('/:productId',(req, res, next) =>{
