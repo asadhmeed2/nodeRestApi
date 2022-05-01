@@ -1,6 +1,8 @@
-const express = require('express')
+const express = require('express');
+const { default: mongoose } = require('mongoose');
 
 const productRoute = express.Router();
+const ProductModel = require('../models/product.model')
 
 
 productRoute.get('/',(req, res, next) =>{
@@ -9,15 +11,21 @@ productRoute.get('/',(req, res, next) =>{
 })
 
 productRoute.post('/',(req, res, next) =>{
-    const product ={
-        name: req.body.name,
-        price: req.body.price,
+    try{
+        const product = new ProductModel({
+            _id: new mongoose.Types.ObjectId(),
+            name: req.body.name,
+            price: parseInt(req.body.price),
+        })
+        console.log(product);
+        product.save();
+        res.status(200).json({
+            message:"adding a product",
+            createdProduct:product
+        })
+    }catch(e){
+        console.error(e.message)
     }
-    console.log(req.body);
-    res.status(200).json({
-        message:"adding a product",
-        createdProduct:product
-    })
 })
 
 productRoute.get('/:productId',(req, res, next) =>{
