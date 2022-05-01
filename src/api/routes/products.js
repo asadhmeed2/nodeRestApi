@@ -5,40 +5,56 @@ const productRoute = express.Router();
 const ProductModel = require('../models/product.model')
 
 
-productRoute.get('/',(req, res, next) =>{
-    res.status(200).json({
-        message:"getting products"})
+productRoute.get('/',async (req, res, next) =>{
+    try{
+        const results= await ProductModel.find({})
+        res.status(200).json(results);
+
+    }catch(err){
+        console.log(err);
+        res.status(500).json({
+            error: err
+        });
+    }
 })
 
-productRoute.post('/',(req, res, next) =>{
+productRoute.post('/',async (req, res, next) =>{
     try{
-        const product = new ProductModel({
+        const product = await ProductModel.create({
             _id: new mongoose.Types.ObjectId(),
             name: req.body.name,
             price: parseInt(req.body.price),
         })
-        console.log(product);
-        product.save();
         res.status(200).json({
             message:"adding a product",
             createdProduct:product
         })
-    }catch(e){
-        console.error(e.message)
+    }catch(err){
+        console.error(err)
+        res.status(500).json({
+            error: err
+        });
     }
 })
 
-productRoute.get('/:productId',(req, res, next) =>{
+productRoute.get('/:productId',async (req, res, next) =>{
     const id = req.params.productId;
-    if(id === 'special'){
-        res.status(200).json({
-            message:"getting a single product",
-            id
-        })
-    }else{
-        res.status(200).json({
-            message:`you passed ID ${id}`
-        })
+    console.log(id);
+    try{
+        const result = await ProductModel.findById(id).exec()
+        if(result){
+            res.status(200).json(result);
+        }else {
+            res.status(404).json({
+                message: "404 not found"
+            })
+        }
+    }
+   catch(err){
+        console.error(err.message);
+        res.status(500).json({
+            error: err
+        });
     }
 })
 
