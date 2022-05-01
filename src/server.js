@@ -1,18 +1,23 @@
 const express = require('express');
 const cors = require('cors');
 const morgan = require('morgan');
+const mongoose = require('mongoose');
 const routes = require('./app');
 const productRoute = require('./api/routes/products');
 const ordersRoute = require('./api/routes/orders');
 const { errors } = require('./middleware/appMiddleware');
 
+require('dotenv').config()
 
 const app = express();
 
 const port = process.env.PORT || 3000
 
-app.use(express.urlencoded({ extended:false }));
+mongoose.connect(process.env.MONGODB_CONNECTION,()=>{
+  console.log("connecting to MongoDB");
+})
 app.use(express.json());
+app.use(express.urlencoded({ extended:false }));
 
 app.use(cors());
 
@@ -34,7 +39,7 @@ app.use((error,req, res, next) =>{
   })
 })
 
-  
+
 app.listen(port,()=>{
     console.log(`server is running on port ${port}`);
 });

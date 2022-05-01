@@ -13,6 +13,7 @@ productRoute.post('/',(req, res, next) =>{
         name: req.body.name,
         price: req.body.price,
     }
+    console.log(req.body);
     res.status(200).json({
         message:"adding a product",
         createdProduct:product
