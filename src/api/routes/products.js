@@ -60,17 +60,35 @@ productRoute.get('/:productId',async (req, res, next) =>{
 
 productRoute.patch('/:productId',(req, res, next) =>{
     const id = req.params.productId;
+    const data = req.body.data;
+    try {
+        const product =ProductModel.findById(id)
+        product ={_id:id,...product,...data}
+        const productM = new ProductModel(product)
+        productM.save();
+    }catch(err){
+
+    }
     res.status(200).json({
         message:"Updated product!"
     })
 })
 
 
-productRoute.delete('/:productId',(req, res, next) =>{
+productRoute.delete('/:productId',async(req, res, next) =>{
     const id = req.params.productId;
-    res.status(200).json({
-        message:"Delete product!"
-    })
+    try{
+        await ProductModel.remove({_id:id},)
+        res.status(200).json({
+            message:`product with id ${id} deleted successfully`
+        })
+    }catch(err){
+        console.log(err.message);
+        res.status(404).json({
+            message:`Product with id ${id} not found`
+        })
+    }
+    
 })
 
 module.exports = productRoute;
