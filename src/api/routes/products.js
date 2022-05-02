@@ -58,20 +58,24 @@ productRoute.get('/:productId',async (req, res, next) =>{
     }
 })
 
-productRoute.patch('/:productId',(req, res, next) =>{
+productRoute.patch('/:productId',async (req, res, next) =>{
     const id = req.params.productId;
     const data = req.body.data;
     try {
-        const product =ProductModel.findById(id)
-        product ={_id:id,...product,...data}
+        let product =await ProductModel.findById(id)
+        product._doc ={...product._doc,...data}
         const productM = new ProductModel(product)
         productM.save();
+        res.status(200).json({
+            message:"Updated product!"
+        })
     }catch(err){
+        console.log(err.message);
+        res.status(404).json({
+            message:"product does not exist!"
+        })
 
     }
-    res.status(200).json({
-        message:"Updated product!"
-    })
 })
 
 
