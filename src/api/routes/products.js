@@ -7,8 +7,13 @@ const ProductModel = require('../models/product.model')
 
 productRoute.get('/',async (req, res, next) =>{
     try{
-        const results= await ProductModel.find({})
-        res.status(200).json(results);
+        const results= await ProductModel.find({}).select('name price');
+        const response ={
+            count: results.length,
+            products: results
+        }
+        
+        res.status(200).json(response);
     }catch(err){
         console.log(err);
         res.status(500).json({

@@ -1,22 +1,44 @@
 const express = require('express')
 
 const ordersRoute = express.Router();
+const mongoose = require('mongoose');
+const OrderModel = require('../models/order.model')
 
-
-ordersRoute.get('/',(req, res, next) =>{
-    res.status(200).json({
-        message:"getting ordre"})
+ordersRoute.get('/',async (req, res, next) =>{
+    try{
+        const orders =await OrderModel.find({}).select('product quantity _id');
+        res.status(200).json({
+            count: orders.length,
+            orders:orders
+        })
+    }catch(err){
+        console.log(err);
+        res.status(500).json({
+            errorMessage: err.message,
+        })
+    }
 })
 
 ordersRoute.post('/',(req, res, next) =>{
-    const order ={
-       productId: req.params.productId,
-       quantity: req.params.quantity
-    }
-    res.status(200).json({
-        message:"order created",
-        ordre: order
+    const order =new OrderModel({
+        _id:new mongoose.Types.ObjectId,
+        productId: mongoose.Types.ObjectId,
+        quantity: req.params.quantity,
+        product:req.body.productId,  
     })
+    try{
+        order.save();
+        res.status(201).json({
+            message:"order created",
+            ordre: order
+        })
+    }catch(e){
+        res.status(500).json({
+            error_message: e.message,
+            message:"error order creation failed!",
+            ordre: order
+        })
+    }
 })
 
 ordersRoute.get('/:orderId',(req, res, next) =>{
