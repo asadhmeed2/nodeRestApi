@@ -1,5 +1,32 @@
 const express = require('express');
 const { default: mongoose } = require('mongoose');
+const multer = require('multer');
+
+const storage = multer.diskStorage({
+    destination: function(req,file,cb){
+        cb(null,'./uploads/')
+    },
+    filename: function(req,file,cb){
+        cb(null, `${file.originalname}`);
+    }
+});
+
+const fileFilter =(req, file, cb) =>{
+    // reject a file
+    //cb(null,false)
+    //accept a file
+    //cb(null,true)
+    if(file.mimetype === 'image/jpeg' || file.mimetype === 'image/png'){
+        cb(null,true);
+    }else{
+        cb(null,false);
+    }
+}
+
+const upload = multer({storage: storage, limits:{
+    fileSize: 1024 * 1024 * 8,
+    },fileFilter:fileFilter
+});
 
 const productRoute = express.Router();
 const ProductModel = require('../models/product.model')
@@ -7,10 +34,10 @@ const ProductModel = require('../models/product.model')
 
 productRoute.get('/',async (req, res, next) =>{
     try{
-        const results= await ProductModel.find({}).select('name price');
+        const results= await ProductModel.find({}).select('name price productImage');
         const response ={
             count: results.length,
-            products: results
+            products: results,
         }
         
         res.status(200).json(response);
@@ -22,12 +49,14 @@ productRoute.get('/',async (req, res, next) =>{
     }
 })
 
-productRoute.post('/',async (req, res, next) =>{
+productRoute.post('/',upload.single('productImage'),async (req, res, next) =>{
     try{
+        console.log(req.file);
         const product = await ProductModel.create({
             _id: new mongoose.Types.ObjectId(),
             name: req.body.name,
             price: parseInt(req.body.price),
+            productImage: req.file.path
         })
         res.status(200).json({
             message:"adding a product",

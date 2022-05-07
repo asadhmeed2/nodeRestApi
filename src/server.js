@@ -23,6 +23,8 @@ app.use(cors());
 
 app.use(morgan('dev'));
 
+app.use('/uploads',express.static('uploads'));
+
 app.use('/',routes)
 
 app.use('/products',productRoute);
