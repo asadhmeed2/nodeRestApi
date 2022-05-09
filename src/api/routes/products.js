@@ -1,7 +1,7 @@
 const express = require('express');
 const { default: mongoose } = require('mongoose');
 const multer = require('multer');
-
+const checkAuth = require('../../middleware/check-outh');
 const storage = multer.diskStorage({
     destination: function(req,file,cb){
         cb(null,'./uploads/')
@@ -24,7 +24,7 @@ const fileFilter =(req, file, cb) =>{
 }
 
 const upload = multer({storage: storage, limits:{
-    fileSize: 1024 * 1024 * 8,
+    fileSize: 1024 * 1024 * 10,
     },fileFilter:fileFilter
 });
 
@@ -49,7 +49,7 @@ productRoute.get('/',async (req, res, next) =>{
     }
 })
 
-productRoute.post('/',upload.single('productImage'),async (req, res, next) =>{
+productRoute.post('/',upload.single('productImage'),checkAuth,async (req, res, next) =>{
     try{
         console.log(req.file);
         const product = await ProductModel.create({
@@ -58,10 +58,12 @@ productRoute.post('/',upload.single('productImage'),async (req, res, next) =>{
             price: parseInt(req.body.price),
             productImage: req.file.path
         })
-        res.status(200).json({
-            message:"adding a product",
-            createdProduct:product
-        })
+        if(product){
+            return res.status(200).json({
+                message:"adding a product",
+                createdProduct:product
+            })
+        }
     }catch(err){
         console.error(err)
         res.status(500).json({
@@ -91,7 +93,7 @@ productRoute.get('/:productId',async (req, res, next) =>{
     }
 })
 
-productRoute.patch('/:productId',async (req, res, next) =>{
+productRoute.patch('/:productId',checkAuth,async (req, res, next) =>{
     const id = req.params.productId;
     const data = req.body;
     try {
@@ -117,7 +119,7 @@ productRoute.patch('/:productId',async (req, res, next) =>{
 })
 
 
-productRoute.delete('/:productId',async(req, res, next) =>{
+productRoute.delete('/:productId',checkAuth,async(req, res, next) =>{
     const id = req.params.productId;
     try{
         await ProductModel.remove({_id:id},)

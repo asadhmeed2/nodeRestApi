@@ -5,6 +5,7 @@ const mongoose = require('mongoose');
 const orderModel = require('../models/order.model');
 const OrderModel = require('../models/order.model');
 const productModel = require('../models/product.model');
+const checkAuth =require('../../middleware/check-outh')
 
 ordersRoute.get('/',async (req, res, next) =>{
     try{
@@ -21,7 +22,7 @@ ordersRoute.get('/',async (req, res, next) =>{
     }
 })
 
-ordersRoute.post('/',async(req, res, next) =>{
+ordersRoute.post('/',checkAuth,async(req, res, next) =>{
     const poduct = await productModel.findById(req.body.productId);
     if(!poduct){
         return res.status(500).json({
@@ -76,7 +77,7 @@ ordersRoute.get('/:orderId',async (req, res, next) =>{
 
 })
 
-ordersRoute.patch('/:orderId',async (req, res, next) =>{
+ordersRoute.patch('/:orderId',checkAuth,async (req, res, next) =>{
     const id = req.params.productId;
     try{
         const order =await OrderModel.findById(id)
@@ -98,7 +99,7 @@ ordersRoute.patch('/:orderId',async (req, res, next) =>{
 })
 
 
-ordersRoute.delete('/:productId',async (req, res, next) =>{
+ordersRoute.delete('/:productId',checkAuth,async (req, res, next) =>{
     const id = req.params.productId;
     try {
         const order= await orderModel.findByIdAndDelete(id);
