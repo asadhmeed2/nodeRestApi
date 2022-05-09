@@ -7,7 +7,7 @@ const OrderModel = require('../models/order.model');
 const productModel = require('../models/product.model');
 const checkAuth =require('../../middleware/check-outh')
 
-ordersRoute.get('/',async (req, res, next) =>{
+ordersRoute.get('/',checkAuth,async (req, res, next) =>{
     try{
         const orders =await OrderModel.find({}).select('product quantity _id').populate("product","name");
         res.status(200).json({
@@ -51,7 +51,7 @@ ordersRoute.post('/',checkAuth,async(req, res, next) =>{
     }
 })
 
-ordersRoute.get('/:orderId',async (req, res, next) =>{
+ordersRoute.get('/:orderId',checkAuth,async (req, res, next) =>{
     const id = req.params.orderId;
     try{
         const order = await orderModel.findById(id).populate("product");
